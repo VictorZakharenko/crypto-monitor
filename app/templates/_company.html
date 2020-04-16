@@ -1,0 +1,27 @@
+<tr id = {{company.crypto}}>
+    <td width="70px">
+    	<img src="{{ company.manager.avatar(70) }}">
+    </td>
+    <td>
+        <a href="{{ url_for('main.manager', mname=company.manager.mname) }}">
+            {{ company.manager.mname }}
+        </a>
+        manages:
+        <a href="{{ url_for('main.crypto', crp=company.crypto) }}">{{ company.crypto }}</a>
+        <br>
+        <p class="lead 1">Last login: <span id = "login{{company.id}}"></span></p>
+        <p class="lead 2">Last import: <span id = "import{{company.id}}"></span></p>
+        <p class="lead 3">Last broadcast: <span id = "broad{{company.id}}"></span></p>
+    </td>
+
+    <td width="70px">
+        <a href="javascript:get_company_summary(
+        '#login{{company.id}}',
+        '#import{{company.id}}',
+        '#broad{{company.id}}',
+        '{{ company.crypto }}')">
+        {{ ('Get company summary') }}</a>
+        <br>
+        <a href="javascript:delete_company('{{ company.crypto }}')">{{ ('Delete company') }}</a>
+    </td>
+</tr>

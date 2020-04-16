@@ -1,0 +1,187 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block title %}
+        {% if title %}{{ title }} - Crypto Monitor{% else %}Crypto Monitor{% endif %}
+{% endblock %}
+
+{% block navbar %}
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{{ url_for('main.index') }}">Crypto Monitor</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+
+                    <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                    <li><a href="{{ url_for('main.managers') }}">Managers</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if current_user.is_anonymous %}
+                    <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                    {% else %}
+                    <li><a href="{{ url_for('main.manager', mname=current_user.mname) }}">Profile</a></li>
+                    <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+                    <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+                    {% endif %}
+                </ul>
+            {% if g.search_form %}
+            <form class="navbar-form navbar-left" method="get"
+                    action="{{ url_for('main.search') }}">
+                <div class="form-group">
+                    {{ g.search_form.q(size=20, class='form-control',
+                        placeholder=g.search_form.q.label.text) }}
+                </div>
+            </form>
+            {% endif %}
+            </div>
+        </div>
+
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-info" role="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {# application content needs to be provided in the app_content block #}
+        {% block app_content %}{% endblock %}
+    </div>
+{% endblock %}
+
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        function get_gr_user_activity(destElem0,destElem1,destElem2, id, email = '') {
+            $(destElem0).html('<img src="{{ url_for('static', filename='loading.gif') }}">');
+            $(destElem1).html('<img src="{{ url_for('static', filename='loading.gif') }}">');
+            $(destElem2).html('<img src="{{ url_for('static', filename='loading.gif') }}">');
+            $.post('{{ url_for('gr_stats.get_gr_user_activity') }}', {
+                id: id,
+                email:email
+            }).done(function(response) {
+                $(destElem0).text(response['days_since_last_login']);
+                $(destElem1).text(response['days_since_last_contact_add']);
+                $(destElem2).text(response['days_since_last_broadcast']);
+            }).fail(function() {
+                $(destElem0).text("{{ ('Error: Could not contact server.') }}");
+            });
+        }  
+        function delete_user(destElem, id){
+            $.post('/delete_user', {
+                id : id,
+            }).done(function(response) {
+                $('.myrow'+id).hide(1500);
+            }).fail(function() {
+                $(destElem).show(1500);
+                location.reload()
+            });
+        }
+
+        function delete_company(crypto){
+            
+            $.post('/delete_company', {
+                crypto : crypto,
+            }).done(function(response) {
+                $('#'+crypto).hide(1500);
+            }).fail(function() {
+                $('#'+crypto).show(1500);
+                location.reload()
+            });
+        }
+
+        function get_crypto_stats(){
+            $("table.crypto tbody tr").each(function (i,row){
+                var $row = $(row);
+                get_gr_user_activity(
+                    "#" + $row.find('td:nth-of-type(2) span').attr('id'),
+                    "#" + $row.find('td:nth-of-type(3) span').attr('id'),
+                    "#" + $row.find('td:nth-of-type(4) span').attr('id'),
+                    id=-1,
+                    email=$row.find('td:nth-of-type(1)').text());
+            });
+        }
+
+        function get_company_summary(destElem0,destElem1,destElem2, crypto){
+            $(destElem0).html('<img src="{{ url_for('static', filename='loading.gif') }}">');
+            $(destElem1).html('<img src="{{ url_for('static', filename='loading.gif') }}">');
+            $(destElem2).html('<img src="{{ url_for('static', filename='loading.gif') }}">');
+            $.post('{{ url_for('gr_stats.get_company_summary') }}', {
+                crypto: crypto
+            }).done(function(response) {
+                $(destElem0).text(response['days_since_last_login']);
+                $(destElem1).text(response['days_since_last_contact_add']);
+                $(destElem2).text(response['days_since_last_broadcast']);
+            }).fail(function() {
+                $(destElem0).text("{{ ('Error: Could not contact server.') }}");
+            });                
+        }
+
+        function get_profile_stats(){
+            $("table.profile tbody tr").each(function (i,row){
+                var $row = $(row);
+                get_company_summary(
+                    "#" + $row.find('td:nth-of-type(2) span').attr('id'),
+                    "#" + $row.find('td:nth-of-type(2) p:nth-of-type(2) span').attr('id'),
+                    '#' + $row.find('td:nth-of-type(2) p:nth-of-type(3) span').attr('id'),
+                    $row.find('td:nth-of-type(2) a:nth-of-type(2)').text());
+            });                            
+        }
+
+        function get_manager_summary(totalSelector, activeSelector, atriskSelector, mname, callback){
+            $(totalSelector).html('<img src="{{ url_for('static', filename='loading.gif') }}">');
+            $(activeSelector).html('<img src="{{ url_for('static', filename='loading.gif') }}">');
+            $(atriskSelector).html('<img src="{{ url_for('static', filename='loading.gif') }}">');
+            $.post('{{ url_for('gr_stats.get_manager_summary') }}', {
+                mname: mname
+            }).done(function(response){
+                $(totalSelector).text(response['total_customers_count']);
+                $(activeSelector).text(response['active_customers_count']);
+                $(atriskSelector).text(response['atrisk_customers_count']);
+                if (callback){
+                    callback()
+                }
+            }).fail(function(){
+                $(totalSelector).text("{{ ('Error: Could not contact server.') }}");
+                $(activeSelector).text("{{ ('Error: Could not contact server.') }}");
+                $(atriskSelector).text("{{ ('Error: Could not contact server.') }}");
+            });
+        }
+
+        function get_office_stats(callback){
+            var total = 0
+            var atrisk = 0
+            var active = 0
+            $("table.profile tbody tr").each(function (i,row){
+                var $row = $(row);
+                get_manager_summary(
+                    "#" + $row.find('td:nth-of-type(2) span').attr('id'),
+                    "#" + $row.find('td:nth-of-type(2) p:nth-of-type(2) span').attr('id'),
+                    '#' + $row.find('td:nth-of-type(2) p:nth-of-type(3) span').attr('id'),
+                    $row.find('td:nth-of-type(2) a').text(),
+                    function(){
+                            total  += +($row.find('td:nth-of-type(2) p:nth-of-type(1) span').text());
+                            active += +($row.find('td:nth-of-type(2) p:nth-of-type(2) span').text());
+                            atrisk += +($row.find('td:nth-of-type(2) p:nth-of-type(3) span').text());
+                            $("#total").text(total);
+                            $("#active").text(active);
+                            $("#atrisk").text(atrisk);
+                        }
+                    )
+            }); 
+        }
+    </script>
+{% endblock %}

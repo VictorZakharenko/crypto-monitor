@@ -1,0 +1,22 @@
+<tr id = {{manager.mname}}>
+    <td width="70px">
+    	<img src="{{ manager.avatar(70) }}">
+    </td>
+    <td>
+        <a href="{{ url_for('main.manager', mname=manager.mname) }}">{{ manager.mname }}</a>
+        <br>
+        <p class="lead 1">Total: <span id = "total{{manager.id}}"></span></p>
+        <p class="lead 2">Active: <span id = "active{{manager.id}}"></span></p>
+        <p class="lead 3">At risk: <span id = "atrisk{{manager.id}}"></span></p>
+    </td>
+
+    <td width="70px">
+        <a href="javascript:get_manager_summary(
+        '#total{{manager.id}}',
+        '#active{{manager.id}}',    
+        '#atrisk{{manager.id}}',
+        '{{manager.mname}}')">
+        {{ ('Get manager summary') }}</a>
+        <br>
+    </td>
+</tr>

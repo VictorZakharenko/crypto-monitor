@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+{% if form %}
+<h1 class="display-4">Add new user for {{title}}</h1>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
+{% endif %}
+<table class="crypto table table-hover">
+    <thead>
+        <tr>
+            <td width="70px"> User email </td>
+            <td width="70px"> Since last login </td>
+            <td width="70px"> Since last contact import </td>
+            <td width="50px"> Since last broadcast </td>
+            <td>
+                <button
+                type="button" 
+                class="btn btn-primary" 
+                onclick="get_crypto_stats()">
+                    Get whole crypto statistics
+                </button>
+            </td>
+
+    </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+            {% include '_user.html' %}
+        {% endfor %}
+    </tbody>
+</table>
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function(){
+        get_crypto_stats()
+    });
+</script>
+{% endblock %}

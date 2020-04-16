@@ -1,0 +1,25 @@
+<tr class = "myrow{{ user.id }}">
+    <td width="70px"> {{ user.email }}</td>
+    <td width="70px"> <span id ="login{{ user.id }}"></span></td>
+    <td width="70px"> <span id ="add{{ user.id }}"></span></td>
+    <td width="70px"> <span id ="broad{{ user.id }}"></span></td>
+    <td width="70px">
+        <span id="get_broad{{ user.id }}">
+            <a href="javascript:get_gr_user_activity(
+                                                    '#login{{ user.id }}',
+                                                    '#add{{ user.id }}',
+                                                    '#broad{{ user.id }}',
+                                                    '{{user.id}}'
+                                                    )">{{ ('Get user activity') }}
+            </a>
+        </span><br>
+        <span id="delete{{ user.id }}">
+            <a href="javascript:delete_user('#row{{ user.id }}','{{user.id}}')">{{ ('Delete user') }}</a>
+        </span>
+    </td>
+</tr>
+
+
+
+
+

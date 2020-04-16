@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+
+{% block app_content %}
+    <h1 class="display-4">All managers here!</h1>
+    <table class="profile table table-hover">
+        <thead>
+            <tr>
+                <td>
+                    Total: <span id="total"></span>
+                </td>
+                <td id=>
+                    Active: <span id="active"></span>
+                    <br>
+                    At risk: <span id="atrisk"></span>
+                </td>
+                <td>
+                    <button
+                    type="button" 
+                    class="btn btn-primary" 
+                    onclick="get_office_stats()">
+                        Get office stats
+                    </button>                    
+                </td>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for manager in managers %}
+                {% include '_manager.html' %}
+            {% endfor %}
+        </tbody>
+    </table>    
+    <nav aria-label="...">
+        <ul class="pager">
+            <li class="previous{% if not prev_url %} disabled{% endif %}">
+                <a href="{{ prev_url or '#' }}">
+                    <span aria-hidden="true">&larr;</span> Newer posts
+                </a>
+            </li>
+            <li class="next{% if not next_url %} disabled{% endif %}">
+                <a href="{{ next_url or '#' }}">
+                    Older posts <span aria-hidden="true">&rarr;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function(){
+            get_office_stats()
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+
+{% block app_content %}<h2>Hi {{ current_user.mname }}! All companies here!</h2>
+    <table class="profile table table-hover">
+        <thead>
+            <tr>
+                <td>
+                    
+                </td>
+                <td>
+                    
+                </td>
+                <td>
+                    <button
+                    type="button" 
+                    class="btn btn-primary" 
+                    onclick="get_profile_stats()">
+                        Get whole picture
+                    </button>                    
+                </td>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for company in companies %}
+                {% include '_company.html' %}
+            {% endfor %}
+        </tbody>
+    </table>    
+    <nav aria-label="...">
+        <ul class="pager">
+            <li class="previous{% if not prev_url %} disabled{% endif %}">
+                <a href="{{ prev_url or '#' }}">
+                    <span aria-hidden="true">&larr;</span> Newer posts
+                </a>
+            </li>
+            <li class="next{% if not next_url %} disabled{% endif %}">
+                <a href="{{ next_url or '#' }}">
+                    Older posts <span aria-hidden="true">&rarr;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function(){
+            get_profile_stats()
+        });
+    </script>
+{% endblock %}
